@@ -10,7 +10,7 @@
 #define SIZE 800
 #define GAP_SIZE 200
 #define SQUARE_SIZE ((SIZE - 2 * GAP_SIZE) / (BOARD_SIZE - 1))
-#define R 30
+#define R (180 / BOARD_SIZE)
 
 using PieceColorMemoryType = int;
 enum class PieceColor : PieceColorMemoryType { BLACK,
@@ -93,6 +93,7 @@ public:
     void SetPosition(SurakartaPosition position);
     void SetColor(PieceColor color);
     void setSelect(bool);
+    void setFixedColor(PieceColor color);
     void Set(SurakartaPosition position, PieceColor color);
     SurakartaPosition GetPosition() const;
     PieceColor GetColor() const;
@@ -101,6 +102,7 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
     void Recover_Color();
+    QPointF CoorDinate();
 
 private:
     SurakartaPosition position_;

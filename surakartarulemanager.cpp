@@ -27,9 +27,6 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
     // TODO: Implement this function.
     SurakartaPlayer current_player = game_info_->current_player_;
     SurakartaPosition mf = move.from, mt = move.to;
-    std::cout<<"from: "<<move.from.x<<" "<<move.from.y<<std::endl;
-    std::cout<<"to: "<<move.to.x<<" "<<move.to.y<<std::endl;
-
 
     if (move.player != current_player) {
         // It's not the player's turn.
@@ -40,7 +37,6 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
     }
     PieceColor color1 = (*board_)[mf.x][mf.y]->GetColor();
     PieceColor color2 = (*board_)[mt.x][mt.y]->GetColor();
-    std::cout<<color1<<" "<<color2<<std::endl;
     if (color1 == PieceColor::NONE) {
         // There is no piece at the position.
         return SurakartaIllegalMoveReason::NOT_PIECE;
@@ -124,12 +120,12 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
                     if (mf == piece[x][id]->GetPosition() && mf == piece[y][0]->GetPosition())
                         // 特判争议下法
                         if (mt == piece[y][1]->GetPosition()){
-                            circle = i;
+                            circle = i - 1;
                             return SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE;
                         }
                     if (mf == piece[x][id]->GetPosition() && mt == piece[y][0]->GetPosition()){
                         // the source position是X上最后一个棋子，the target position是Y上第一个棋子
-                        circle = i;
+                        circle = i - 1;
                         return SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE;
                     }
                 }
@@ -138,11 +134,11 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
                     int id = piece[x].size() - 1;
                     if (mf == piece[y][0]->GetPosition() && mf == piece[x][id]->GetPosition())
                         if (mt == piece[x][id - 1]->GetPosition()){
-                            circle = i;
+                            circle = i - 1;
                             return SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE;
                         }
                     if (mf == piece[y][0]->GetPosition() && mt == piece[x][id]->GetPosition()){
-                        circle = i;
+                        circle = i - 1;
                         return SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE;
                     }
                 }

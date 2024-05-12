@@ -1,6 +1,8 @@
 #include "surakartagame.h"
 #include <fstream>
 #include <iostream>
+#include <cmath>
+#define EPS 0.5
 
 void SurakartaGame::StartGame(std::string file_name) {
     if (file_name.empty()) {
@@ -11,25 +13,25 @@ void SurakartaGame::StartGame(std::string file_name) {
         QRectF rect(GAP_SIZE, GAP_SIZE, SIZE - GAP_SIZE * 2, SIZE - GAP_SIZE * 2);
         board_->scene->addRect(rect, pen, brush);
         for (int var = 1; var < BOARD_SIZE / 2; ++var) {
-            QPainterPath line;
-            line.moveTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, GAP_SIZE));
-            line.lineTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, SIZE - GAP_SIZE));
+            QPainterPath path;
+            path.moveTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, GAP_SIZE));
+            path.lineTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, SIZE - GAP_SIZE));
             rect.setRect(GAP_SIZE - SQUARE_SIZE * var, SIZE - GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
-            line.arcMoveTo(rect, 90);
-            line.lineTo(SIZE - GAP_SIZE, SIZE - GAP_SIZE - SQUARE_SIZE * var);
-            line.arcTo(rect, 90, 270);
+            path.arcTo(rect, 0, -270);
+            path.arcMoveTo(rect, 90);
+            path.lineTo(SIZE - GAP_SIZE, SIZE - GAP_SIZE - SQUARE_SIZE * var);
             rect.setRect(SIZE - GAP_SIZE - SQUARE_SIZE * var, SIZE - GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
-            line.arcMoveTo(rect, 180);
-            line.lineTo(SIZE - GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE);
-            line.arcTo(rect, -180, 270);
+            path.arcTo(rect, 90, -270);
+            path.arcMoveTo(rect, 180);
+            path.lineTo(SIZE - GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE);
             rect.setRect(SIZE - GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
-            line.arcMoveTo(rect, 270);
-            line.lineTo(GAP_SIZE, GAP_SIZE + SQUARE_SIZE * var);
-            line.arcTo(rect, -90, 270);
+            path.arcTo(rect, 180, -270);
+            path.arcMoveTo(rect, 270);
+            path.lineTo(GAP_SIZE, GAP_SIZE + SQUARE_SIZE * var);
             rect.setRect(GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
-            line.arcTo(rect, 0, 270);
-            board_->scene->addPath(line);
-            board_->lines.push_back(line);
+            path.arcTo(rect, -90, -270);
+            board_->scene->addPath(path);
+            board_->paths.push_back(path);
         }
         for (unsigned int y = 0; y < board_size_; y++) {
             for (unsigned int x = 0; x < board_size_; x++) {
@@ -86,25 +88,45 @@ SurakartaMoveResponse SurakartaGame::Move(const SurakartaMove& move) {
 
     UpdateGameInfo(move_reason, end_reason, winner);
 
-    std::cout<<"move"<<std::endl;
-    std::cout<<move_reason<<std::endl;
-    if (move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE) {
-        std::cout<<"enter"<<std::endl;
-        std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
-        (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
-        (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
-        board_->scene->update();
-        rule_manager_->OnUpdateBoard();
-    } else if (move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE) {
-
-        rule_manager_->OnUpdateBoard();
-    }
-    else{
-        board_->scene->update();
+    if(move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE || move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE){
+        if (move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE) {
+            /*std::cout<<"enter"<<std::endl;*/
+            std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
+            (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
+            (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
+            board_->scene->update();
+            rule_manager_->OnUpdateBoard();
+        } else if (move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE) {
+            Animation(move);
+            (*board_)[move.to.x][move.to.y]->SetColor(PieceColor::NONE);
+            (*board_)[move.to.x][move.to.y]->setFixedColor(PieceColor::NONE);
+            std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
+            (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
+            (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
+            board_->scene->update();
+            rule_manager_->OnUpdateBoard();
+        }
     }
 
     SurakartaMoveResponse response(move_reason, end_reason, winner);
     return response;
+}
+
+void SurakartaGame::Animation(const SurakartaMove& move)
+{
+    board_->animation->setItem((*board_)[move.from.x][move.from.y].get());
+    QPointF pos = board_->paths[rule_manager_->circle].pointAtPercent(0);
+    QPointF from = (*board_)[move.from.x][move.from.y]->CoorDinate();
+    QPointF to = (*board_)[move.to.x][move.to.y]->CoorDinate();
+    to.setX(to.x() - from.x()), to.setY(to.y() - from.y());
+    pos.setX(pos.x() - from.x()), pos.setY(pos.y() - from.y());
+    board_->timeline->start();
+    for (int var = 0; var <= 1000 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); ++var) {
+        std::cout<<"ENTER"<<std::endl;
+        pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
+        board_->animation->setPosAt(var / 1000.0, pos);
+    }
+    board_->scene->update();
 }
 
 

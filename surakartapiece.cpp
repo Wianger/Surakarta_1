@@ -12,6 +12,7 @@ SurakartaPiece::SurakartaPiece(SurakartaPosition position, PieceColor color)
 void SurakartaPiece::SetPosition(SurakartaPosition position)
 {
     position_ = position;
+    prepareGeometryChange();
 }
 
 void SurakartaPiece::SetColor(PieceColor color)
@@ -23,6 +24,8 @@ void SurakartaPiece::setSelect(bool t)
 {
     is_selected = t;
 }
+
+void SurakartaPiece::setFixedColor(PieceColor color) { fixed_color_ = color; }
 
 void SurakartaPiece::Set(SurakartaPosition position, PieceColor color) {
     position_ = position;
@@ -49,6 +52,7 @@ QRectF SurakartaPiece::boundingRect() const
 
 void SurakartaPiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    if(color_ != PieceColor::NONE){
         if(color_ == PieceColor::WHITE)
             painter->setBrush(Qt::white);
         else if(color_ == PieceColor::BLACK)
@@ -56,7 +60,14 @@ void SurakartaPiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         else if(color_ == PieceColor::YELLOW)
             painter->setBrush(Qt::yellow);
         painter->drawEllipse(boundingRect());
-
+    }
 }
 
 void SurakartaPiece::Recover_Color() { color_ = fixed_color_; }
+
+QPointF SurakartaPiece::CoorDinate()
+{
+    qreal x = GAP_SIZE + position_.x * SQUARE_SIZE;
+    qreal y = GAP_SIZE + position_.y * SQUARE_SIZE;
+    return QPointF(x, y);
+}
