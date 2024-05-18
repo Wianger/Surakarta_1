@@ -11,7 +11,6 @@
 #define SIZE 800
 #define GAP_SIZE 200
 #define SQUARE_SIZE ((SIZE - 2 * GAP_SIZE) / (BOARD_SIZE - 1))
-#define R (180 / BOARD_SIZE)
 
 using PieceColorMemoryType = int;
 enum class PieceColor : PieceColorMemoryType { BLACK,
@@ -109,6 +108,7 @@ private:
     SurakartaPosition position_;
     PieceColor color_;
     PieceColor fixed_color_;
+    unsigned int r = 180 / BOARD_SIZE;
     bool is_selected;
 };
 

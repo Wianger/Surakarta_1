@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     networkdata.cpp \
+    networksocket.cpp \
     surakartaboard.cpp \
     surakartagame.cpp \
     surakartapiece.cpp \
@@ -23,6 +24,7 @@ HEADERS += \
     choosedlg.h \
     mainwindow.h \
     networkdata.h \
+    networksocket.h \
     surakartaboard.h \
     surakartacommon.h \
     surakartagame.h \

@@ -45,9 +45,9 @@ std::ostream& operator<<(std::ostream& os, const SurakartaPiece& piece) {
 
 QRectF SurakartaPiece::boundingRect() const
 {
-    qreal x = GAP_SIZE + position_.x * SQUARE_SIZE - R;
-    qreal y = GAP_SIZE + position_.y * SQUARE_SIZE - R;
-    return QRectF(x, y, 2 * R, 2 * R);
+    qreal x = GAP_SIZE + position_.x * SQUARE_SIZE - r;
+    qreal y = GAP_SIZE + position_.y * SQUARE_SIZE - r;
+    return QRectF(x, y, 2 * r, 2 * r);
 }
 
 void SurakartaPiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)

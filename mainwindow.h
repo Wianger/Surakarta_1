@@ -4,7 +4,10 @@
 #include <QMainWindow>
 #include <surakartagame.h>
 #include <QTimer>
+#include <surakartaboard.h>
+#include <QMessageBox>
 #include "networkdata.h"
+#include <networksocket.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,6 +31,9 @@ private:
     SurakartaGame *game;
     QTimer *timer;
     unsigned int CountDown = 10, restTime = CountDown;
+    int port = 10086;
+    QString ip = "127.0.0.1";
+    NetworkSocket *socket;
 
 private slots:
     void on_pushButton_clicked();

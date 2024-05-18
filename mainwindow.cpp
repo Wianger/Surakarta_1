@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <surakartaboard.h>
-#include <QMessageBox>
 
 QString player2str(SurakartaPlayer pl)
 {
