@@ -45,7 +45,8 @@ public:
         : board_size_(board_size),
         board_(std::make_shared<SurakartaBoard>(parent)),
         game_info_(std::make_shared<SurakartaGameInfo>(max_no_capture_round)),
-        rule_manager_(std::make_shared<SurakartaRuleManager>(board_, game_info_)) {}
+        rule_manager_(std::make_shared<SurakartaRuleManager>(board_, game_info_)),
+        is_captured(false)    {}
 
 
     /**
@@ -81,13 +82,14 @@ public:
         rule_manager_ = rule_manager;
     }
     std::shared_ptr<SurakartaRuleManager> GetRuleManager() const { return rule_manager_; }  // For testing
-    void Animation(const SurakartaMove& move);
+    //void Animation(const SurakartaMove& move);
 
     //    private:
     unsigned int board_size_;
     std::shared_ptr<SurakartaBoard> board_;
     std::shared_ptr<SurakartaGameInfo> game_info_;
     std::shared_ptr<SurakartaRuleManager> rule_manager_;
+    bool is_captured;
 };
 
 #endif // SURAKARTAGAME_H

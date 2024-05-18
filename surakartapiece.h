@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <iostream>
 #include <QGraphicsSceneMouseEvent>
+#include <QObject>
 
 #define BOARD_SIZE 6
 #define SIZE 800

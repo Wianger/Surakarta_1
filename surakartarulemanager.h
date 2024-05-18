@@ -13,7 +13,7 @@ public:
         : board_size_(board->board_size_),
         board_(std::const_pointer_cast<const SurakartaBoard>(board)),
         game_info_(std::const_pointer_cast<const SurakartaGameInfo>(game_info)),
-        circle(0) {}
+        circle(0), clock(0) {}
 
     unsigned int GetBoardSize() {
         return board_size_;
@@ -45,6 +45,7 @@ public:
     std::shared_ptr<const SurakartaBoard> board_;
     std::shared_ptr<const SurakartaGameInfo> game_info_;
     unsigned int circle;
+    int clock;
 };
 
 #endif // SURAKARTARULEMANAGER_H

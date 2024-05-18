@@ -25,8 +25,8 @@ public:
     std::vector<QPainterPath> paths;
     QGraphicsScene *scene;
     static unsigned int selected_num;
-    QGraphicsItemAnimation *animation;
-    QTimeLine *timeline;
+    //QGraphicsItemAnimation *animation;
+    //QTimeLine *timeline;
     static SurakartaPosition from, to;
 
     explicit SurakartaBoard(QWidget *parent = nullptr);

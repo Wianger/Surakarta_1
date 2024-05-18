@@ -2,9 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QGraphicsScene>
 #include <surakartagame.h>
-#include <QPropertyAnimation>
+#include <QTimer>
+#include "networkdata.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,14 +19,20 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void updatePlayerInfo();
+    void endGame();
+    void restartGame();
 
 private:
     Ui::MainWindow *ui;
     SurakartaGame *game;
-    QPropertyAnimation *animation;
+    QTimer *timer;
+    unsigned int CountDown = 10, restTime = CountDown;
 
 private slots:
     void on_pushButton_clicked();
+    void updateCountdown();
+    void on_pushButton_2_clicked();
 };
 
 #endif // MAINWINDOW_H

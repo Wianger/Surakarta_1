@@ -1,8 +1,5 @@
 #include "surakartagame.h"
 #include <fstream>
-#include <iostream>
-#include <cmath>
-#define EPS 0.5
 
 void SurakartaGame::StartGame(std::string file_name) {
     if (file_name.empty()) {
@@ -87,47 +84,46 @@ SurakartaMoveResponse SurakartaGame::Move(const SurakartaMove& move) {
     auto [end_reason, winner] = rule_manager_->JudgeEnd(move_reason);
 
     UpdateGameInfo(move_reason, end_reason, winner);
-
-    if(move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE || move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE){
-        if (move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE) {
-            /*std::cout<<"enter"<<std::endl;*/
-            std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
-            (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
-            (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
-            board_->scene->update();
-            rule_manager_->OnUpdateBoard();
-        } else if (move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE) {
-            Animation(move);
-            (*board_)[move.to.x][move.to.y]->SetColor(PieceColor::NONE);
-            (*board_)[move.to.x][move.to.y]->setFixedColor(PieceColor::NONE);
-            std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
-            (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
-            (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
-            board_->scene->update();
-            rule_manager_->OnUpdateBoard();
-        }
+    if (move_reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE) {
+        std::swap((*board_)[move.to.x][move.to.y], (*board_)[move.from.x][move.from.y]);
+        (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
+        (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
+        rule_manager_->OnUpdateBoard();
+    } else if (move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE) {
+        (*board_)[move.to.x][move.to.y] = (*board_)[move.from.x][move.from.y];
+        (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
+        (*board_)[move.from.x][move.from.y] = std::make_shared<SurakartaPiece>(move.from.x, move.from.y, PieceColor::NONE);
+        rule_manager_->OnUpdateBoard();
     }
 
     SurakartaMoveResponse response(move_reason, end_reason, winner);
     return response;
 }
 
-void SurakartaGame::Animation(const SurakartaMove& move)
+/*void SurakartaGame::Animation(const SurakartaMove& move)
 {
     board_->animation->setItem((*board_)[move.from.x][move.from.y].get());
-    QPointF pos = board_->paths[rule_manager_->circle].pointAtPercent(0);
+    QPointF pos;
     QPointF from = (*board_)[move.from.x][move.from.y]->CoorDinate();
     QPointF to = (*board_)[move.to.x][move.to.y]->CoorDinate();
     to.setX(to.x() - from.x()), to.setY(to.y() - from.y());
-    pos.setX(pos.x() - from.x()), pos.setY(pos.y() - from.y());
     board_->timeline->start();
-    for (int var = 0; var <= 1000 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); ++var) {
-        std::cout<<"ENTER"<<std::endl;
-        pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
-        board_->animation->setPosAt(var / 1000.0, pos);
+    std::cout<<rule_manager_->clock<<std::endl;
+    if(rule_manager_->clock == 1){
+        for (int var = 0; var <= 1000 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); ++var) {
+            //std::cout<<pos.x()<<" "<<pos.y()<<std::endl;
+            //std::cout<<to.x()<<" "<<to.y()<<std::endl;
+            pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
+            board_->animation->setPosAt(var / 1000.0, pos);
+        }
+    }
+    else if(rule_manager_->clock == -1){
+        for (int var = 1000, i = 0; var >= 0 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); --var, ++i) {
+            //std::cout<<pos.x()<<" "<<pos.y()<<std::endl;
+            //std::cout<<to.x()<<" "<<to.y()<<std::endl;
+            pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
+            board_->animation->setPosAt(i / 1000.0, pos);
+        }
     }
     board_->scene->update();
-}
-
-
-
+}*/

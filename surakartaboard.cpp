@@ -1,4 +1,5 @@
 #include "surakartaboard.h"
+#include <iostream>
 
 SurakartaBoard::SurakartaBoard(QWidget *parent)
     : QGraphicsView{parent}{
@@ -8,11 +9,11 @@ SurakartaBoard::SurakartaBoard(QWidget *parent)
     }
     scene = new QGraphicsScene(0, 0, SIZE, SIZE);
     setScene(scene);
-    animation = new QGraphicsItemAnimation;
+    /*animation = new QGraphicsItemAnimation;
     timeline = new QTimeLine(10000);
     timeline->setFrameRange(1, 1000);
     timeline->setLoopCount(1);
-    animation->setTimeLine(timeline);
+    animation->setTimeLine(timeline);*/
 }
 
 unsigned int SurakartaBoard::selected_num = 0;
@@ -33,6 +34,8 @@ void SurakartaBoard::mousePressEvent(QMouseEvent *event)
         std::cout<<"PressEorror"<<std::endl;*/
     SurakartaPiece *surakartaPiece = dynamic_cast<SurakartaPiece*>(piece);
     if(surakartaPiece){
+        std::cout<<surakartaPiece->GetColor()<<std::endl;
+        std::cout<<"position: "<<surakartaPiece->GetPosition().x<<" "<<surakartaPiece->GetPosition().y<<std::endl;
         if(!selected_num) {
             surakartaPiece->SetColor(PieceColor::YELLOW);
             surakartaPiece->setSelect(true);
