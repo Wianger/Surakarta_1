@@ -55,8 +55,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    SurakartaMove move = SurakartaMove(SurakartaBoard::from, SurakartaBoard::to, game->game_info_->current_player_);
     if(SurakartaBoard::selected_num == 2)
-        game->Move(SurakartaMove(SurakartaBoard::from, SurakartaBoard::to, game->game_info_->current_player_));
+        game->Move(move);
+    if(game->game_info_->IsEnd())
+        endGame();
+    else{
+        restTime = CountDown;
+        timer->start(1000);
+        updatePlayerInfo();
+    }
 }
 
 void MainWindow::updatePlayerInfo()
