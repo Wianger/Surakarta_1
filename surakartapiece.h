@@ -7,10 +7,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QObject>
 
-#define BOARD_SIZE 6
 #define SIZE 800
 #define GAP_SIZE 200
-#define SQUARE_SIZE ((SIZE - 2 * GAP_SIZE) / (BOARD_SIZE - 1))
 
 using PieceColorMemoryType = int;
 enum class PieceColor : PieceColorMemoryType { BLACK,
@@ -103,6 +101,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
     void Recover_Color();
     QPointF CoorDinate();
+    static unsigned int SQUARE_SIZE;
+    static unsigned int BOARD_SIZE;
 
 private:
     SurakartaPosition position_;

@@ -1,5 +1,8 @@
 #include "surakartapiece.h"
 
+unsigned int SurakartaPiece::BOARD_SIZE = 6;
+unsigned int SurakartaPiece::SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (BOARD_SIZE - 1);
+
 SurakartaPiece::SurakartaPiece()
     : position_({0, 0}), color_(PieceColor::NONE), fixed_color_(PieceColor::NONE), is_selected(false) {}
 

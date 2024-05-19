@@ -1,9 +1,12 @@
 #include "surakartaboard.h"
 #include <iostream>
 
-SurakartaBoard::SurakartaBoard(QWidget *parent)
+SurakartaBoard::SurakartaBoard(QWidget *parent, unsigned int boardsize)
     : QGraphicsView{parent}{
-    board_size_ = BOARD_SIZE;
+    board_size_ = boardsize;
+    square_size = (SIZE - 2 * GAP_SIZE) / (board_size_ - 1);
+    SurakartaPiece::BOARD_SIZE = boardsize;
+    SurakartaPiece::SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (boardsize - 1);
     for (unsigned int i = 0; i < board_size_; i++) {
         this->push_back(SurakartRow(board_size_));
     }
@@ -34,8 +37,8 @@ void SurakartaBoard::mousePressEvent(QMouseEvent *event)
         std::cout<<"PressEorror"<<std::endl;*/
     SurakartaPiece *surakartaPiece = dynamic_cast<SurakartaPiece*>(piece);
     if(surakartaPiece){
-        std::cout<<surakartaPiece->GetColor()<<std::endl;
-        std::cout<<"position: "<<surakartaPiece->GetPosition().x<<" "<<surakartaPiece->GetPosition().y<<std::endl;
+        //std::cout<<surakartaPiece->GetColor()<<std::endl;
+        //std::cout<<"position: "<<surakartaPiece->GetPosition().x<<" "<<surakartaPiece->GetPosition().y<<std::endl;
         if(!selected_num) {
             surakartaPiece->SetColor(PieceColor::YELLOW);
             surakartaPiece->setSelect(true);

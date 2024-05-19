@@ -9,10 +9,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../NetworkLibrary/networkdata.cpp \
+    ../NetworkLibrary/networkserver.cpp \
+    ../NetworkLibrary/networksocket.cpp \
+    logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    networkdata.cpp \
-    networksocket.cpp \
+    setting.cpp \
     surakartaboard.cpp \
     surakartagame.cpp \
     surakartapiece.cpp \
@@ -20,9 +23,12 @@ SOURCES += \
     surakartarulemanager.cpp
 
 HEADERS += \
+    ../NetworkLibrary/networkdata.h \
+    ../NetworkLibrary/networkserver.h \
+    ../NetworkLibrary/networksocket.h \
+    logindialog.h \
     mainwindow.h \
-    networkdata.h \
-    networksocket.h \
+    setting.h \
     surakartaboard.h \
     surakartacommon.h \
     surakartagame.h \
@@ -37,3 +43,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    game.txt

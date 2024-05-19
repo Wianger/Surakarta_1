@@ -1,42 +1,51 @@
 #include "surakartagame.h"
 #include <fstream>
+#include <iostream>
 
 void SurakartaGame::StartGame(std::string file_name) {
     if (file_name.empty()) {
+        //board_->scene->clear();
         QPen pen;
         pen.setWidth(2);
         QBrush brush;
         brush.setColor(Qt::white);
         QRectF rect(GAP_SIZE, GAP_SIZE, SIZE - GAP_SIZE * 2, SIZE - GAP_SIZE * 2);
         board_->scene->addRect(rect, pen, brush);
-        for (int var = 1; var < BOARD_SIZE / 2; ++var) {
+        std::cout<<board_size_<<std::endl;
+        for (unsigned int var = 1; var < board_size_ / 2; ++var) {
             QPainterPath path;
-            path.moveTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, GAP_SIZE));
-            path.lineTo(QPointF(GAP_SIZE + SQUARE_SIZE * var, SIZE - GAP_SIZE));
-            rect.setRect(GAP_SIZE - SQUARE_SIZE * var, SIZE - GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
+            path.moveTo(QPointF(GAP_SIZE + board_->square_size * var, GAP_SIZE));
+            path.lineTo(QPointF(GAP_SIZE + board_->square_size * var, SIZE - GAP_SIZE));
+            rect.setRect(GAP_SIZE - board_->square_size * var, SIZE - GAP_SIZE - board_->square_size * var, board_->square_size * var * 2, board_->square_size * var * 2);
             path.arcTo(rect, 0, -270);
             path.arcMoveTo(rect, 90);
-            path.lineTo(SIZE - GAP_SIZE, SIZE - GAP_SIZE - SQUARE_SIZE * var);
-            rect.setRect(SIZE - GAP_SIZE - SQUARE_SIZE * var, SIZE - GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
+            path.lineTo(SIZE - GAP_SIZE, SIZE - GAP_SIZE - board_->square_size * var);
+            rect.setRect(SIZE - GAP_SIZE - board_->square_size * var, SIZE - GAP_SIZE - board_->square_size * var, board_->square_size * var * 2, board_->square_size * var * 2);
             path.arcTo(rect, 90, -270);
             path.arcMoveTo(rect, 180);
-            path.lineTo(SIZE - GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE);
-            rect.setRect(SIZE - GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
+            path.lineTo(SIZE - GAP_SIZE - board_->square_size * var, GAP_SIZE);
+            rect.setRect(SIZE - GAP_SIZE - board_->square_size * var, GAP_SIZE - board_->square_size * var, board_->square_size * var * 2, board_->square_size * var * 2);
             path.arcTo(rect, 180, -270);
             path.arcMoveTo(rect, 270);
-            path.lineTo(GAP_SIZE, GAP_SIZE + SQUARE_SIZE * var);
-            rect.setRect(GAP_SIZE - SQUARE_SIZE * var, GAP_SIZE - SQUARE_SIZE * var, SQUARE_SIZE * var * 2, SQUARE_SIZE * var * 2);
+            path.lineTo(GAP_SIZE, GAP_SIZE + board_->square_size * var);
+            rect.setRect(GAP_SIZE - board_->square_size * var, GAP_SIZE - board_->square_size * var, board_->square_size * var * 2, board_->square_size * var * 2);
             path.arcTo(rect, -90, -270);
             board_->scene->addPath(path);
             board_->paths.push_back(path);
         }
+        PieceColor p;
+        if(player == "BLACK" || player == "")
+            p = PieceColor::BLACK;
+        else if(player == "WHITE")
+            p = PieceColor::WHITE;
+        std::cout<<player.toStdString()<<" "<<p<<std::endl;
         for (unsigned int y = 0; y < board_size_; y++) {
             for (unsigned int x = 0; x < board_size_; x++) {
                 if (y < 2) {
-                    (*board_)[x][y] = std::make_shared<SurakartaPiece>(x, y, PieceColor::BLACK);
+                    (*board_)[x][y] = std::make_shared<SurakartaPiece>(x, y, p);
                     board_->scene->addItem((*board_)[x][y].get());
                 } else if (y >= board_size_ - 2) {
-                    (*board_)[x][y] = std::make_shared<SurakartaPiece>(x, y, PieceColor::WHITE);
+                    (*board_)[x][y] = std::make_shared<SurakartaPiece>(x, y, ReverseColor(p));
                     board_->scene->addItem((*board_)[x][y].get());
                 } else {
                     (*board_)[x][y] = std::make_shared<SurakartaPiece>(x, y, PieceColor::NONE);
@@ -54,11 +63,15 @@ void SurakartaGame::StartGame(std::string file_name) {
     rule_manager_->OnUpdateBoard();
 }
 
-void SurakartaGame::SaveGame(std::string file_name) const {
+void SurakartaGame::SaveGame(std::string file_name) {
     std::ofstream fout(file_name);
-    fout << (*board_);
-    fout << (*game_info_);
-    fout.close();
+    if(fout.is_open()){
+        std::cout<<file_name<<std::endl;
+        fout<<"tnnd"<<std::endl;
+        fout << (*board_);
+        fout << (*game_info_);
+        fout.close();
+    }
 }
 
 void SurakartaGame::UpdateGameInfo(SurakartaIllegalMoveReason move_reason, SurakartaEndReason end_reason, SurakartaPlayer winner) {

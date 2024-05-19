@@ -6,27 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1239</width>
-    <height>638</height>
+    <width>1316</width>
+    <height>928</height>
    </rect>
   </property>
   <property name="font">
    <font>
     <family>华文行楷</family>
-    <pointsize>20</pointsize>
+    <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="move">
     <property name="geometry">
      <rect>
-      <x>850</x>
-      <y>480</y>
-      <width>111</width>
-      <height>41</height>
+      <x>870</x>
+      <y>120</y>
+      <width>121</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -77,17 +77,68 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="resigne">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>1020</x>
       <y>120</y>
       <width>121</width>
       <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>华文行楷</family>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>认输</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="receive_edit">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>180</y>
+      <width>381</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>华文楷体</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="send_edit">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>770</y>
+      <width>311</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>华文楷体</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="send_msg">
+    <property name="geometry">
+     <rect>
+      <x>1180</x>
+      <y>770</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>发送</string>
     </property>
    </widget>
   </widget>
@@ -96,8 +147,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1239</width>
-     <height>34</height>
+     <width>1316</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

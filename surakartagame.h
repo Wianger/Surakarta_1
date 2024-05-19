@@ -41,12 +41,14 @@ public:
 
 class SurakartaGame {
 public:
-    SurakartaGame(QWidget *parent = nullptr, unsigned board_size = BOARD_SIZE, unsigned int max_no_capture_round = 40)
-        : board_size_(board_size),
-        board_(std::make_shared<SurakartaBoard>(parent)),
+    SurakartaGame(QWidget *parent = nullptr, unsigned board_size = 6, QString p = "BLACK", unsigned int max_no_capture_round = 40)
+        :  board_size_(board_size),
+        board_(std::make_shared<SurakartaBoard>(parent, board_size)),
         game_info_(std::make_shared<SurakartaGameInfo>(max_no_capture_round)),
         rule_manager_(std::make_shared<SurakartaRuleManager>(board_, game_info_)),
-        is_captured(false)    {}
+        is_captured(false), player(p)  {
+        SurakartaPiece::BOARD_SIZE = board_size;
+    }
 
 
     /**
@@ -58,7 +60,7 @@ public:
      * @brief Save the game to a file.
      * @param file_name The file name.
      */
-    void SaveGame(std::string file_name) const;
+    void SaveGame(std::string file_name);
 
     /**
      * @brief Update game info, this function should be called after each move.
@@ -82,14 +84,14 @@ public:
         rule_manager_ = rule_manager;
     }
     std::shared_ptr<SurakartaRuleManager> GetRuleManager() const { return rule_manager_; }  // For testing
-    //void Animation(const SurakartaMove& move);
 
-    //    private:
+    //    private:   
     unsigned int board_size_;
     std::shared_ptr<SurakartaBoard> board_;
     std::shared_ptr<SurakartaGameInfo> game_info_;
     std::shared_ptr<SurakartaRuleManager> rule_manager_;
     bool is_captured;
+    QString player;
 };
 
 #endif // SURAKARTAGAME_H

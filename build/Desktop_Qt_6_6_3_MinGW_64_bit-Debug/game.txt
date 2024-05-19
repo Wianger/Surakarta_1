@@ -1,0 +1,13 @@
+tnnd
+B B B B B B 
+B B B B . B 
+. . . . B . 
+. . . W . . 
+W W W W . W 
+W W W W W W 
+current_player: B
+num_round: 3
+last_captured_round: 0
+end_reason: RESIGN
+winner: W
+max_no_capture_round: 40

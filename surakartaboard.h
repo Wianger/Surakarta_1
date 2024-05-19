@@ -28,8 +28,9 @@ public:
     //QGraphicsItemAnimation *animation;
     //QTimeLine *timeline;
     static SurakartaPosition from, to;
+    unsigned int square_size;
 
-    explicit SurakartaBoard(QWidget *parent = nullptr);
+    explicit SurakartaBoard(QWidget *parent = nullptr, unsigned int boardsize = 6);
     bool IsInside(const SurakartaPosition& position) const;
     friend inline std::ostream& operator<<(std::ostream& os, const SurakartaBoard& board) {
         for (unsigned int y = 0; y < board.board_size_; y++) {
