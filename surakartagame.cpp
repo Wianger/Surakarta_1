@@ -2,9 +2,23 @@
 #include <fstream>
 #include <iostream>
 
+qreal findNearearPercentage(const QPainterPath& path, const QPointF& point)
+{
+    qreal minDistance = std::numeric_limits<qreal>::max();
+    qreal nearestPercentage = 0.0;
+    for (int t = 0; t <= 1; t += 0.01) {
+        QPointF pathPoint = path.pointAtPercent(t);
+        qreal distance = QLineF(pathPoint, point).length();
+        if(distance < minDistance){
+            minDistance = distance;
+            nearestPercentage = t;
+        }
+    }
+    return nearestPercentage;
+}
+
 void SurakartaGame::StartGame(std::string file_name) {
     if (file_name.empty()) {
-        //board_->scene->clear();
         QPen pen;
         pen.setWidth(2);
         QBrush brush;
@@ -33,12 +47,6 @@ void SurakartaGame::StartGame(std::string file_name) {
             board_->scene->addPath(path);
             board_->paths.push_back(path);
         }
-        PieceColor p;
-        if(player == "BLACK" || player == "")
-            p = PieceColor::BLACK;
-        else if(player == "WHITE")
-            p = PieceColor::WHITE;
-        std::cout<<player.toStdString()<<" "<<p<<std::endl;
         for (unsigned int y = 0; y < board_size_; y++) {
             for (unsigned int x = 0; x < board_size_; x++) {
                 if (y < 2) {
@@ -88,9 +96,8 @@ void SurakartaGame::UpdateGameInfo(SurakartaIllegalMoveReason move_reason, Surak
 }
 
 SurakartaMoveResponse SurakartaGame::Move(const SurakartaMove& move) {
-    (*board_)[move.from.x][move.from.y]->Recover_Color();
+    Recover_Color();
     (*board_)[move.from.x][move.from.y]->setSelect(false);
-    (*board_)[move.to.x][move.to.y]->Recover_Color();
     (*board_)[move.to.x][move.to.y]->setSelect(false);
     SurakartaBoard::selected_num = 0;
     SurakartaIllegalMoveReason move_reason = rule_manager_->JudgeMove(move);
@@ -103,6 +110,16 @@ SurakartaMoveResponse SurakartaGame::Move(const SurakartaMove& move) {
         (*board_)[move.from.x][move.from.y]->SetPosition(move.from);
         rule_manager_->OnUpdateBoard();
     } else if (move_reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE) {
+        /*board_->animation->setTargetObject((*board_)[move.from.x][move.from.y].get());
+        board_->animation->setPropertyName("pos");
+        QPointF from = (*board_)[move.from.x][move.from.y]->CoorDinate(),
+            to = (*board_)[move.to.x][move.to.y]->CoorDinate();
+        QPainterPath path = board_->paths[rule_manager_->circle];
+        qreal percentage1 = findNearearPercentage(path, from),
+            percentage2 = findNearearPercentage(path, to);
+        board_->animation->setKeyValueAt(0, path.pointAtPercent(percentage1));
+        board_->animation->setKeyValueAt(1, path.pointAtPercent(percentage2));
+        board_->animation->start();*/
         (*board_)[move.to.x][move.to.y] = (*board_)[move.from.x][move.from.y];
         (*board_)[move.to.x][move.to.y]->SetPosition(move.to);
         (*board_)[move.from.x][move.from.y] = std::make_shared<SurakartaPiece>(move.from.x, move.from.y, PieceColor::NONE);
@@ -113,30 +130,22 @@ SurakartaMoveResponse SurakartaGame::Move(const SurakartaMove& move) {
     return response;
 }
 
-/*void SurakartaGame::Animation(const SurakartaMove& move)
+void SurakartaGame::SetPlayer(QString play)
 {
-    board_->animation->setItem((*board_)[move.from.x][move.from.y].get());
-    QPointF pos;
-    QPointF from = (*board_)[move.from.x][move.from.y]->CoorDinate();
-    QPointF to = (*board_)[move.to.x][move.to.y]->CoorDinate();
-    to.setX(to.x() - from.x()), to.setY(to.y() - from.y());
-    board_->timeline->start();
-    std::cout<<rule_manager_->clock<<std::endl;
-    if(rule_manager_->clock == 1){
-        for (int var = 0; var <= 1000 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); ++var) {
-            //std::cout<<pos.x()<<" "<<pos.y()<<std::endl;
-            //std::cout<<to.x()<<" "<<to.y()<<std::endl;
-            pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
-            board_->animation->setPosAt(var / 1000.0, pos);
+    if(play == "BLACK")
+        p = SurakartaPlayer::BLACK;
+    else if(play == "WHITE")
+        p = SurakartaPlayer::WHITE;
+    player = play;
+}
+
+void SurakartaGame::Recover_Color()
+{
+    for (unsigned int i = 0; i < board_size_; ++i) {
+        for (unsigned int j = 0; j < board_size_; ++j) {
+            (*board_)[i][j]->Recover_Color();
+            board_->scene->update();
         }
     }
-    else if(rule_manager_->clock == -1){
-        for (int var = 1000, i = 0; var >= 0 && (abs(pos.x() - to.x()) > EPS || abs(pos.y() - to.y()) > EPS); --var, ++i) {
-            //std::cout<<pos.x()<<" "<<pos.y()<<std::endl;
-            //std::cout<<to.x()<<" "<<to.y()<<std::endl;
-            pos.setX(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).x() - from.x()), pos.setY(board_->paths[rule_manager_->circle].pointAtPercent(var / 1000.0).y() - from.y());
-            board_->animation->setPosAt(i / 1000.0, pos);
-        }
-    }
-    board_->scene->update();
-}*/
+}
+

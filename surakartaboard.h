@@ -7,8 +7,7 @@
 #include "surakartapiece.h"
 #include <QMouseEvent>
 #include <QWidget>
-#include <QGraphicsItemAnimation>
-#include <QTimeLine>
+#include <QPropertyAnimation>
 
 class SurakartRow : public std::vector<std::shared_ptr<SurakartaPiece>> {
 public:
@@ -24,9 +23,8 @@ public:
     unsigned int board_size_;
     std::vector<QPainterPath> paths;
     QGraphicsScene *scene;
+    QPropertyAnimation *animation;
     static unsigned int selected_num;
-    //QGraphicsItemAnimation *animation;
-    //QTimeLine *timeline;
     static SurakartaPosition from, to;
     unsigned int square_size;
 

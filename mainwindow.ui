@@ -25,8 +25,8 @@
      <rect>
       <x>870</x>
       <y>120</y>
-      <width>121</width>
-      <height>51</height>
+      <width>91</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -80,10 +80,10 @@
    <widget class="QPushButton" name="resigne">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1050</x>
       <y>120</y>
-      <width>121</width>
-      <height>51</height>
+      <width>91</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -139,6 +139,44 @@
     </property>
     <property name="text">
      <string>发送</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ai">
+    <property name="geometry">
+     <rect>
+      <x>1140</x>
+      <y>120</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ink Free</family>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>AI托管</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="prompt">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>120</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>华文行楷</family>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>提示</string>
     </property>
    </widget>
   </widget>

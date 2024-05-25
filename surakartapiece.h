@@ -1,7 +1,7 @@
 #ifndef SURAKARTAPIECE_H
 #define SURAKARTAPIECE_H
 
-#include <QGraphicsItem>
+#include <QGraphicsEllipseItem>
 #include <QPainter>
 #include <iostream>
 #include <QGraphicsSceneMouseEvent>
@@ -14,6 +14,7 @@ using PieceColorMemoryType = int;
 enum class PieceColor : PieceColorMemoryType { BLACK,
                                                WHITE,
                                                YELLOW,
+                                               RED,
                                                NONE,
                                                UNKNOWN
 };
@@ -82,8 +83,9 @@ struct SurakartaPosition {
     }
 };
 
-class SurakartaPiece : public QGraphicsItem
+class SurakartaPiece : public QGraphicsObject
 {
+    Q_OBJECT
 public:
     SurakartaPiece();
     SurakartaPiece(unsigned int x, unsigned int y, PieceColor color);
@@ -95,6 +97,7 @@ public:
     void Set(SurakartaPosition position, PieceColor color);
     SurakartaPosition GetPosition() const;
     PieceColor GetColor() const;
+    PieceColor GetFixColor() {return fixed_color_;}
     bool GetSelect() const;
     friend std::ostream& operator<<(std::ostream& os, const SurakartaPiece& piece);
     QRectF boundingRect() const;

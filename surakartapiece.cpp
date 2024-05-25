@@ -62,6 +62,8 @@ void SurakartaPiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
             painter->setBrush(Qt::black);
         else if(color_ == PieceColor::YELLOW)
             painter->setBrush(Qt::yellow);
+        else if(color_ == PieceColor::RED)
+            painter->setBrush(Qt::red);
         painter->drawEllipse(boundingRect());
     }
 }

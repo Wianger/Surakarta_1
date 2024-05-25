@@ -16,6 +16,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     setting.cpp \
+    surakartaagent.cpp \
     surakartaboard.cpp \
     surakartagame.cpp \
     surakartapiece.cpp \
@@ -26,9 +27,12 @@ HEADERS += \
     ../NetworkLibrary/networkdata.h \
     ../NetworkLibrary/networkserver.h \
     ../NetworkLibrary/networksocket.h \
+    GlobalRandomGenerator.h \
+    SurakartaAgentBase.h \
     logindialog.h \
     mainwindow.h \
     setting.h \
+    surakartaagent.h \
     surakartaboard.h \
     surakartacommon.h \
     surakartagame.h \

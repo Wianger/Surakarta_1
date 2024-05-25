@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QLineEdit>
 #include <QVBoxLayout>
+#include <string>
+#include <iostream>
 
 QString player2str(SurakartaPlayer pl)
 {
@@ -34,38 +36,66 @@ QString endReason2String(SurakartaEndReason endReason) {
     }
 }
 
-MainWindow::MainWindow(unsigned int boardsize, unsigned int countdown, QString p, QWidget *parent)
+MainWindow::MainWindow(unsigned int boardsize, unsigned int countdown, QString p, QString u,
+                       QString r, int pt, unsigned int round, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , CountDown(countdown), restTime(countdown)
+    , timer(new QTimer(this))
+    , socket(new NetworkSocket(new QTcpSocket(this), this))
+    , port(pt), username(u), room(r)
 {
     ui->setupUi(this);
+    ui->move->setEnabled(false);
+    ui->resigne->setEnabled(false);
+    ui->ai->setEnabled(false);
     game = new SurakartaGame(ui->centralwidget, boardsize, p);
     game->board_->setGeometry(0, 0, SIZE + 10, SIZE + 10);
-    game->StartGame();
+    //game->SetPlayer(p);
+    //game->StartGame();
+    game->game_info_->max_no_capture_round_ = round;
+    //agent = new SurakartaAgent(game->GetBoard(), game->GetGameInfo(), game->GetRuleManager());
     ui->label->setText("Current_Player : " + player2str(game->game_info_->current_player_));
-    restTime = countdown, CountDown = countdown;
-    timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateCountdown);
-    //timer->start(1000);
     ui->label_2->setText("CountDown : " + QString::number(restTime) + "s");
-    socket = new NetworkSocket(new QTcpSocket(this), this);
-    connect(socket->base(), &QTcpSocket::connected, this, &MainWindow::connected_successfully);  // connected 是客户端连接成功后发出的信号
+    connect(socket->base(), &QTcpSocket::connected, this, &MainWindow::connected_successfully);
     connect(socket, &NetworkSocket::receive, this, &MainWindow::receiveMessage);
+    file.setFileName("C:\\Surakarta\\Testing\\game.txt");
+    bool a = file.open(QIODevice::WriteOnly);
+    if(a)
+        std::cout<<"FILEOPEN"<<std::endl;
+}
+
+void MainWindow::Move(SurakartaMove move)
+{
+    game->Move(move);
+    restTime = CountDown;
+    ui->label_2->setText("CountDown : " + QString::number(restTime) + "s");
+    timer->start(1000);
+    updatePlayerInfo();
 }
 
 void MainWindow::on_move_clicked()
 {
+    /*auto move = agent->CalculateMove();
+    NetworkData data = NetworkData(OPCODE::MOVE_OP, QString(char('A'+move.from.x)) + QString::number(move.from.y),
+                                   QString(char('A'+move.to.x)) + QString::number(move.to.y), "");
+    std::cout<<(data.data1 + "->" + data.data2 + " ").toStdString()<<std::endl;
+    file.write((data.data1 + "->" + data.data2 + " ").toUtf8());
+    file.flush();
+    sendMessage(data.op, data.data1, data.data2, "");
+    Move(move);
+    if(game->game_info_->IsEnd()){
+        endGame(data.data1, data.data2, data.data3);
+    }*/
     SurakartaMove move = SurakartaMove(SurakartaBoard::from, SurakartaBoard::to, game->game_info_->current_player_);
+    NetworkData data = NetworkData(OPCODE::MOVE_OP, QString(char('A'+move.from.x)) + QString::number(move.from.y),
+                                       QString(char('A'+move.to.x)) + QString::number(move.to.y), "");
+    file.write((data.data1 + "->" + data.data2 + " ").toUtf8());
+    file.flush();
+    sendMessage(data.op, data.data1, data.data2, "");
     if(SurakartaBoard::selected_num == 2){
-        game->Move(move);
-        sendMessage(OPCODE::MOVE_OP, QString(char('A'+move.from.x)) + QString::number(move.from.y), QString(char('A'+move.to.x)) + QString::number(move.to.y));
-        if(game->game_info_->IsEnd())
-            endGame();
-        else{
-            restTime = CountDown;
-            //timer->start(1000);
-            updatePlayerInfo();
-        }
+        Move(move);
     }
 }
 
@@ -79,26 +109,20 @@ void MainWindow::updateCountdown()
     if (restTime > 0) {
         restTime--;
         ui->label_2->setText("CountDown : " + QString::number(restTime) + "s");
-        update(); // 每秒更新界面
+        update();
     } else {
         timer->stop();
-        game->game_info_->end_reason_ = SurakartaEndReason::TIMEOUT;
-        endGame();
     }
 }
 
-void MainWindow::endGame()
+void MainWindow::endGame(QString SurakartaIllegalMoveReason, QString SurakartaEndReason, QString Winner)
 {
-    game->SaveGame("game.txt");
+    //game->SaveGame("game.txt");
     QString endMessage;
-    if (game->game_info_->end_reason_ == SurakartaEndReason::CHECKMATE) {
-        endMessage = "玩家 " + player2str(game->game_info_->winner_) + " 获胜!";
-    } else if (game->game_info_->end_reason_ == SurakartaEndReason::TIMEOUT) {
-        endMessage = "玩家 " + player2str(game->game_info_->current_player_) + " 超时认输!" + "\n" + "Winner : " + player2str(game->game_info_->winner_);
-    } else {
-        endMessage = "游戏结束，失败原因 : " + endReason2String(game->game_info_->end_reason_) + "\n" + "Winner : " + player2str(game->game_info_->winner_);
-    }
-
+    endMessage = "SurakartaIllegalMoveReason: " + SurakartaIllegalMoveReason + "\n"
+                 + "SurakartaEndReason: " + SurakartaEndReason + "\n"
+                 + "Winner: " + Winner + "\n"
+                 + "步数: " + QString::number(game->game_info_->num_round_) + "\n";
     timer->stop();
 
     QMessageBox::StandardButton result = QMessageBox::information(this, "游戏结束", endMessage);
@@ -106,104 +130,142 @@ void MainWindow::endGame()
     {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "游戏结束", "是否再来一局", QMessageBox::Yes|QMessageBox::No);
-        if (reply == QMessageBox::Yes) {
+        if (reply == QMessageBox::Yes)
             restartGame();
+        else if(reply == QMessageBox::Cancel || reply == QMessageBox::Abort){
+            sendMessage(OPCODE::LEAVE_OP, "", "", "");
+            disconnect();
         }
     }
 }
 
 void MainWindow::restartGame()
 {
-    connectToServer();
+    connected_successfully();
     game->StartGame();
     updatePlayerInfo();
     SurakartaBoard::selected_num = 0;
     restTime = CountDown;
-    //timer->start(1000);
-    connected_successfully();
+    ui->label_2->setText("CountDown : " + QString::number(restTime) + "s");
     update();
 }
 
-void MainWindow::setInfo(QString u, QString r, QString po)
-{
-    username = u;
-    room = r;
-    port = po.toInt();
-}
-
-
-/*void MainWindow::on_pushButton_2_clicked()
-{
-    if(game->is_captured){
-        (*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->SetColor(PieceColor::NONE);
-        (*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->setFixedColor(PieceColor::NONE);
-        (*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->SetPosition(SurakartaBoard::from);
-        (*game->board_)[SurakartaBoard::from.x][SurakartaBoard::from.y]->SetPosition(SurakartaBoard::to);
-        std::swap((*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y], (*game->board_)[SurakartaBoard::from.x][SurakartaBoard::from.y]);
-        std::cout<<" "<<(*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->GetColor()<<std::endl;
-        std::cout<<" "<<(*game->board_)[SurakartaBoard::from.x][SurakartaBoard::from.y]->GetPosition().x<<" "<<(*game->board_)[SurakartaBoard::from.x][SurakartaBoard::from.y]->GetPosition().y<<std::endl;
-        std::cout<<" "<<(*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->GetPosition().x<<" "<<(*game->board_)[SurakartaBoard::to.x][SurakartaBoard::to.y]->GetPosition().y<<std::endl;
-        game->is_captured = false;
-        game->board_->scene->update();
-    }
-}*/
-
-
 void MainWindow::on_resigne_clicked()
 {
-    SurakartaPlayer current_player = game->game_info_->current_player_;
-    if (current_player == PieceColor::BLACK)
-        QMessageBox::information(this, "认输", "黑棋认输");
-    else if (current_player == PieceColor::WHITE)
-        QMessageBox::information(this, "认输", "白棋认输");
-
-    game->game_info_->end_reason_=SurakartaEndReason::RESIGN;
     SurakartaPlayer cp = game->game_info_->current_player_;
-    if(cp == PieceColor::BLACK)
-        game->game_info_->winner_ = PieceColor::WHITE;
-    else
-        game->game_info_->winner_ = PieceColor::BLACK;
-    sendMessage(OPCODE::RESIGN_OP, "", "");
-    endGame();
-
+    if(cp == game->p){
+        sendMessage(OPCODE::RESIGN_OP, "", "", "");
+    }
 }
 
 void MainWindow::connectToServer() {
-    socket->hello(ip, port);                       // 连接服务器 ip:port
-    this->socket->base()->waitForConnected(2000);  // 等待连接，2s 后超时
+    socket->hello(ip, port);
+    this->socket->base()->waitForConnected(2000);
 }
 
 void MainWindow::connected_successfully() {
-    // 连接成功后，设置界面的状态
-    socket->send(NetworkData(OPCODE::READY_OP, username, game->player, room));
-    // 这个程序中，连接成功后，发送一个消息给服务器，告诉服务器我已经准备好了,这不是网络中必须的操作，但是在游戏中，我们可能会规定这样的行为
+    sendMessage(OPCODE::READY_OP, username, game->player, room);
 }
 
 void MainWindow::disconnectFromServer() {
-    socket->send(NetworkData(OPCODE::LEAVE_OP, "", "", ""));
+    sendMessage(OPCODE::LEAVE_OP, game->player, "", "");
     socket->bye();
 }
 
-void MainWindow::sendMessage(OPCODE op, QString m1, QString m2) {
-    socket->send(NetworkData(op, m1, m2, "")); // 发送消息给服务端，是不是很简单
+void MainWindow::sendMessage(OPCODE s, QString u, QString message1, QString message2) {
+    ui->receive_edit->append(QString::number(static_cast<int>(s)) + " " + u + " " + message1 + " " + message2);
+    socket->send(NetworkData(s, u, message1, message2));
     ui->send_edit->clear();
 }
 
 void MainWindow::receiveMessage(NetworkData data) {
-    ui->receive_edit->append(data.data1); // data 是收到的消息，我们显示出来
-    ui->receive_edit->append(data.data2);
-    ui->receive_edit->append(data.data3);
-}
-
-MainWindow::~MainWindow() {
-    delete ui;
-    delete socket;
+    ui->receive_edit->append(QString::number(static_cast<int>(data.op)) + " " + data.data1 + " " + data.data2 + " " + data.data3);
+    if(data.op == OPCODE::READY_OP) {
+        game->SetPlayer(data.data2);
+        game->StartGame();
+        agent = new SurakartaAgent(game->GetBoard(), game->GetGameInfo(), game->GetRuleManager());
+        ui->move->setEnabled(true);
+        ui->resigne->setEnabled(true);
+        ui->ai->setEnabled(true);
+        if(game->player == "BALCK"){
+            timer->start(1000);
+            if(is_ai){
+                auto move = agent->CalculateMove();
+                NetworkData data = NetworkData(OPCODE::MOVE_OP, QString(char('A'+move.from.x)) + QString::number(move.from.y),
+                                               QString(char('A'+move.to.x)) + QString::number(move.to.y), "");
+                file.write((data.data1 + "->" + data.data2 + " ").toUtf8());
+                file.flush();
+                sendMessage(data.op, data.data1, data.data2, "");
+                Move(move);
+            }
+        }
+    }
+    else if(data.op == OPCODE::MOVE_OP){
+        std::string t = data.data1.toStdString();
+        SurakartaPosition from = SurakartaPosition((t[0] - 65), (t[1] - 48));
+        t = data.data2.toStdString();
+        SurakartaPosition to = SurakartaPosition((t[0] - 65), (t[1] - 48));
+        SurakartaMove move = SurakartaMove(from, to, game->game_info_->current_player_);
+        NetworkData data = NetworkData(OPCODE::MOVE_OP, QString(char('A'+move.from.x)) + QString::number(move.from.y),
+                                       QString(char('A'+move.to.x)) + QString::number(move.to.y), "");
+        file.write((data.data1 + "->" + data.data2 + " ").toUtf8());
+        file.flush();
+        Move(move);
+        if(is_ai){
+            auto move = agent->CalculateMove();
+            Move(move);
+        }
+    }
+    else if(data.op == OPCODE::END_OP){
+        endGame(data.data1, data.data2, data.data3);
+    }
 }
 
 void MainWindow::on_send_msg_clicked()
 {
     QString message = ui->send_edit->text();
-    sendMessage(OPCODE::CHAT_OP, username, message);
-    ui->receive_edit->append(message);
+    sendMessage(OPCODE::CHAT_OP, username, message, "");
+}
+
+MainWindow::~MainWindow() {
+    delete ui;
+    delete game;
+    delete timer;
+    delete socket;
+    file.close();
+}
+
+
+void MainWindow::on_ai_clicked()
+{
+    if(is_ai){
+        ui->move->setEnabled(false);
+        is_ai = true;
+    }
+    else{
+        ui->move->setEnabled(true);
+        is_ai = false;
+    }
+}
+
+
+void MainWindow::on_prompt_clicked()
+{
+    if(SurakartaBoard::selected_num == 1){
+        for (unsigned int i = 0; i < game->board_size_; ++i) {
+            for (unsigned int j = 0; j < game->board_size_; ++j) {
+                SurakartaIllegalMoveReason reason = game->rule_manager_->JudgeMove(SurakartaMove(SurakartaBoard::from,
+                                                    SurakartaPosition(i, j), game->game_info_->current_player_));
+                if(reason == SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE || reason == SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE){
+                    (*game->board_)[i][j]->SetColor(PieceColor::RED);
+                    game->board_->scene->update();
+                }
+                else{
+                    (*game->board_)[i][j]->Recover_Color();
+                    game->board_->scene->update();
+                }
+            }
+        }
+    }
 }
 

@@ -1,13 +1,1 @@
-tnnd
-B B B B B B 
-B B B B . B 
-. . . . B . 
-. . . W . . 
-W W W W . W 
-W W W W W W 
-current_player: B
-num_round: 3
-last_captured_round: 0
-end_reason: RESIGN
-winner: W
-max_no_capture_round: 40
+F1->E2 A4->A3 E1->F1 B4->A4 E2->D2 F4->E3 F1->E1 E3->D3 D2->E3 D5->E3 C1->D2 A5->B4 D1->E2 E5->D5 B1->A2 B4->B3 A2->B2 A4->A5 F0->F1 C4->B4 B2->B1 A5->A4 A1->B2 C5->C4 B1->A1 F5->F4 C0->C1 E4->F5 D2->C3 F4->E5 C1->C0 F5->E4 A1->B1 E3->D2 B0->A1 A4->A5 E0->D1 B4->A4 B1->C1 

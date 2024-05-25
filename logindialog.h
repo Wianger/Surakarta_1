@@ -21,7 +21,6 @@ private:
     QLineEdit *playerEdit;
     QLineEdit *roomEdit;
     QLineEdit *portEdit;
-    QLineEdit *ipEdit;
     QPushButton *loginButton;
     Setting *setting;
 };

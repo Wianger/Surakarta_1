@@ -16,6 +16,7 @@ public:
 private:
     QLineEdit *boardsizeEdit;
     QLineEdit *countdownEdit;
+    QLineEdit *roundEdit;
     QPushButton *confirmButton;
     QString username, player, room, port;
     MainWindow *w;

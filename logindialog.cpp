@@ -17,9 +17,6 @@ LoginDialog::LoginDialog(QWidget *parent) : QDialog(parent)
     QLabel *portLabel = new QLabel("Port:", this);
     portEdit = new QLineEdit(this);
     portEdit->setText("10086");
-    QLabel *ipLabel = new QLabel("IP:", this);
-    ipEdit = new QLineEdit(this);
-    ipEdit->setText("127.0.0.1");
     loginButton = new QPushButton("Login", this);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -31,8 +28,6 @@ LoginDialog::LoginDialog(QWidget *parent) : QDialog(parent)
     layout->addWidget(roomEdit);
     layout->addWidget(portLabel);
     layout->addWidget(portEdit);
-    layout->addWidget(ipLabel);
-    layout->addWidget(ipEdit);
     layout->addWidget(loginButton);
     setLayout(layout);
     connect(loginButton, &QPushButton::clicked, this, &LoginDialog::onLoginClicked);

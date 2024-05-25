@@ -85,6 +85,9 @@ public:
     }
     std::shared_ptr<SurakartaRuleManager> GetRuleManager() const { return rule_manager_; }  // For testing
 
+    void SetPlayer(QString);
+    void Recover_Color();
+
     //    private:   
     unsigned int board_size_;
     std::shared_ptr<SurakartaBoard> board_;
@@ -92,6 +95,7 @@ public:
     std::shared_ptr<SurakartaRuleManager> rule_manager_;
     bool is_captured;
     QString player;
+    SurakartaPlayer p;
 };
 
 #endif // SURAKARTAGAME_H

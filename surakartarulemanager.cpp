@@ -34,8 +34,8 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
         // The position is out of the board.
         return SurakartaIllegalMoveReason::OUT_OF_BOARD;
     }
-    PieceColor color1 = (*board_)[mf.x][mf.y]->GetColor();
-    PieceColor color2 = (*board_)[mt.x][mt.y]->GetColor();
+    PieceColor color1 = (*board_)[mf.x][mf.y]->GetFixColor();
+    PieceColor color2 = (*board_)[mt.x][mt.y]->GetFixColor();
     if (color1 == PieceColor::NONE) {
         // There is no piece at the position.
         return SurakartaIllegalMoveReason::NOT_PIECE;
