@@ -1,18 +1,12 @@
 #include "surakartaboard.h"
 
-SurakartaBoard::SurakartaBoard(QWidget *parent, unsigned int boardsize)
+SurakartaBoard::SurakartaBoard(QWidget *parent)
     : QGraphicsView{parent}{
-    board_size_ = boardsize;
-    square_size = (SIZE - 2 * GAP_SIZE) / (board_size_ - 1);
-    SurakartaPiece::BOARD_SIZE = boardsize;
-    SurakartaPiece::SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (boardsize - 1);
-    for (unsigned int i = 0; i < board_size_; i++) {
-        this->push_back(SurakartRow(board_size_));
+    for (unsigned int i = 0; i < BOARDSIZE; i++) {
+        this->push_back(SurakartRow());
     }
     scene = new QGraphicsScene(0, 0, SIZE, SIZE);
     setScene(scene);
-    animation = new QPropertyAnimation;
-    animation->setDuration(5000);
 }
 
 unsigned int SurakartaBoard::selected_num = 0;
@@ -20,7 +14,7 @@ SurakartaPosition SurakartaBoard::from = SurakartaPosition(-1, -1);
 SurakartaPosition SurakartaBoard::to = SurakartaPosition(-1, -1);
 
 bool SurakartaBoard::IsInside(const SurakartaPosition& position) const {
-    return position.x < board_size_ && position.y < board_size_;
+    return position.x < BOARDSIZE && position.y < BOARDSIZE;
 }
 
 void SurakartaBoard::mousePressEvent(QMouseEvent *event)
@@ -34,6 +28,7 @@ void SurakartaBoard::mousePressEvent(QMouseEvent *event)
             surakartaPiece->setSelect(true);
             from = surakartaPiece->GetPosition();
             selected_num ++;
+            emit promt();
             scene->update();
         }
         else if(selected_num == 1){
@@ -42,23 +37,14 @@ void SurakartaBoard::mousePressEvent(QMouseEvent *event)
                 surakartaPiece->setSelect(false);
                 from = SurakartaPosition(-1, -1);
                 selected_num --;
+                emit cancle();
                 scene->update();
             }
             else{
-                surakartaPiece->SetColor(PieceColor::YELLOW);
                 surakartaPiece->setSelect(true);
                 to = surakartaPiece->GetPosition();
                 selected_num ++;
-                scene->update();
-            }
-        }
-        else if(selected_num == 2)
-        {
-            if(surakartaPiece->GetPosition() == to){
-                surakartaPiece->Recover_Color();
-                surakartaPiece->setSelect(false);
-                to = SurakartaPosition(-1, -1);
-                selected_num --;
+                emit move();
                 scene->update();
             }
         }

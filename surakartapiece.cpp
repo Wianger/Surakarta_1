@@ -1,8 +1,5 @@
 #include "surakartapiece.h"
 
-unsigned int SurakartaPiece::BOARD_SIZE = 6;
-unsigned int SurakartaPiece::SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (BOARD_SIZE - 1);
-
 SurakartaPiece::SurakartaPiece()
     : position_({0, 0}), color_(PieceColor::NONE), fixed_color_(PieceColor::NONE), is_selected(false) {}
 
@@ -48,6 +45,7 @@ std::ostream& operator<<(std::ostream& os, const SurakartaPiece& piece) {
 
 QRectF SurakartaPiece::boundingRect() const
 {
+    unsigned int SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (BOARDSIZE - 1);
     qreal x = GAP_SIZE + position_.x * SQUARE_SIZE - r;
     qreal y = GAP_SIZE + position_.y * SQUARE_SIZE - r;
     return QRectF(x, y, 2 * r, 2 * r);
@@ -61,9 +59,9 @@ void SurakartaPiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         else if(color_ == PieceColor::BLACK)
             painter->setBrush(Qt::black);
         else if(color_ == PieceColor::YELLOW)
-            painter->setBrush(Qt::yellow);
+            painter->setBrush(Qt::lightGray);
         else if(color_ == PieceColor::RED)
-            painter->setBrush(Qt::red);
+            painter->setBrush(Qt::yellow);
         painter->drawEllipse(boundingRect());
     }
 }
@@ -72,6 +70,7 @@ void SurakartaPiece::Recover_Color() { color_ = fixed_color_; }
 
 QPointF SurakartaPiece::CoorDinate()
 {
+    unsigned int SQUARE_SIZE = (SIZE - 2 * GAP_SIZE) / (BOARDSIZE - 1);
     qreal x = GAP_SIZE + position_.x * SQUARE_SIZE;
     qreal y = GAP_SIZE + position_.y * SQUARE_SIZE;
     return QPointF(x, y);

@@ -2,7 +2,6 @@
 #define SURAKARTARULEMANAGER_H
 
 #include <surakartaboard.h>
-#include <surakartacommon.h>
 
 class SurakartaRuleManager {
 public:
@@ -10,14 +9,8 @@ public:
 
     SurakartaRuleManager(std::shared_ptr<SurakartaBoard> board,
                          std::shared_ptr<SurakartaGameInfo> game_info)
-        : board_size_(board->board_size_),
-        board_(std::const_pointer_cast<const SurakartaBoard>(board)),
-        game_info_(std::const_pointer_cast<const SurakartaGameInfo>(game_info)),
-        circle(0), clock(0) {}
-
-    unsigned int GetBoardSize() {
-        return board_size_;
-    }
+        : board_(std::const_pointer_cast<const SurakartaBoard>(board)),
+        game_info_(std::const_pointer_cast<const SurakartaGameInfo>(game_info)) {}
 
     virtual void OnUpdateBoard();
 
@@ -41,11 +34,10 @@ public:
     SurakartaPosition Row_Line(SurakartaPosition, unsigned int);
 
     //    protected:
-    unsigned int board_size_;
     std::shared_ptr<const SurakartaBoard> board_;
     std::shared_ptr<const SurakartaGameInfo> game_info_;
-    unsigned int circle;
-    int clock;
+    unsigned int winnum = 0, circle = 0;
+    int clock = 0;
 };
 
 #endif // SURAKARTARULEMANAGER_H

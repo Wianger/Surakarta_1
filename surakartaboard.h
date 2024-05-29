@@ -11,8 +11,8 @@
 
 class SurakartRow : public std::vector<std::shared_ptr<SurakartaPiece>> {
 public:
-    SurakartRow(unsigned int board_size)
-        : std::vector<std::shared_ptr<SurakartaPiece>>(board_size) {}
+    SurakartRow()
+        : std::vector<std::shared_ptr<SurakartaPiece>>(BOARDSIZE) {}
 };
 
 
@@ -20,19 +20,16 @@ class SurakartaBoard : public QGraphicsView, public std::vector<SurakartRow>
 {
     Q_OBJECT
 public:
-    unsigned int board_size_;
     std::vector<QPainterPath> paths;
     QGraphicsScene *scene;
-    QPropertyAnimation *animation;
     static unsigned int selected_num;
     static SurakartaPosition from, to;
-    unsigned int square_size;
 
-    explicit SurakartaBoard(QWidget *parent = nullptr, unsigned int boardsize = 6);
+    explicit SurakartaBoard(QWidget *parent = nullptr);
     bool IsInside(const SurakartaPosition& position) const;
     friend inline std::ostream& operator<<(std::ostream& os, const SurakartaBoard& board) {
-        for (unsigned int y = 0; y < board.board_size_; y++) {
-            for (unsigned int x = 0; x < board.board_size_; x++) {
+        for (unsigned int y = 0; y < BOARDSIZE; y++) {
+            for (unsigned int x = 0; x < BOARDSIZE; x++) {
                 os << (*board[x][y]) << " ";
             }
             os << std::endl;
@@ -41,8 +38,8 @@ public:
     }
 
     friend inline std::istream& operator>>(std::istream& is, SurakartaBoard& board) {
-        for (unsigned int y = 0; y < board.board_size_; y++) {
-            for (unsigned int x = 0; x < board.board_size_; x++) {
+        for (unsigned int y = 0; y < BOARDSIZE; y++) {
+            for (unsigned int x = 0; x < BOARDSIZE; x++) {
                 char ch;
                 is >> ch;
                 PieceColor color;
@@ -64,6 +61,10 @@ public:
     }
 protected:
     void mousePressEvent(QMouseEvent *event);
+signals:
+    void promt();
+    void cancle();
+    void move();
 };
 
 #endif // SURAKARTABOARD_H

@@ -1,9 +1,9 @@
 #ifndef SURAKARTAGAME_H
 #define SURAKARTAGAME_H
 
-#include <surakartacommon.h>
-#include <surakartaboard.h>
 #include <surakartarulemanager.h>
+#include <QGraphicsItemAnimation>
+#include <QTimeLine>
 
 class SurakartaMoveResponse {
 public:
@@ -39,15 +39,18 @@ public:
     SurakartaPlayer winner_;
 };
 
-class SurakartaGame {
+class SurakartaGame: public QObject{
+    Q_OBJECT
 public:
-    SurakartaGame(QWidget *parent = nullptr, unsigned board_size = 6, QString p = "BLACK", unsigned int max_no_capture_round = 40)
-        :  board_size_(board_size),
-        board_(std::make_shared<SurakartaBoard>(parent, board_size)),
-        game_info_(std::make_shared<SurakartaGameInfo>(max_no_capture_round)),
+    SurakartaGame(QWidget *parent = nullptr)
+        :board_(std::make_shared<SurakartaBoard>(parent)),
+        game_info_(std::make_shared<SurakartaGameInfo>()),
         rule_manager_(std::make_shared<SurakartaRuleManager>(board_, game_info_)),
-        is_captured(false), player(p)  {
-        SurakartaPiece::BOARD_SIZE = board_size;
+        is_captured(false) {
+        animation = new QGraphicsItemAnimation;
+        timeline = new QTimeLine(5000);
+        timeline->setFrameRange(0, 10000);
+        animation->setTimeLine(timeline);
     }
 
 
@@ -73,9 +76,8 @@ public:
      * @param move The move to be made.
      * @return See SurakartaMoveResponse.
      */
-    SurakartaMoveResponse Move(const SurakartaMove& move);
+    SurakartaMoveResponse Move(const SurakartaMove& move, bool);
 
-    unsigned int GetBoardSize() const { return board_size_; }
     std::shared_ptr<SurakartaBoard> GetBoard() const { return board_; }
     std::shared_ptr<SurakartaGameInfo> GetGameInfo() const { return game_info_; }
     bool IsEnd() const { return game_info_->IsEnd(); }
@@ -84,18 +86,16 @@ public:
         rule_manager_ = rule_manager;
     }
     std::shared_ptr<SurakartaRuleManager> GetRuleManager() const { return rule_manager_; }  // For testing
-
-    void SetPlayer(QString);
     void Recover_Color();
-
-    //    private:   
-    unsigned int board_size_;
     std::shared_ptr<SurakartaBoard> board_;
     std::shared_ptr<SurakartaGameInfo> game_info_;
     std::shared_ptr<SurakartaRuleManager> rule_manager_;
+    QGraphicsItemAnimation *animation;
+    QTimeLine *timeline;
     bool is_captured;
     QString player;
-    SurakartaPlayer p;
+signals:
+    void capture();  
 };
 
 #endif // SURAKARTAGAME_H

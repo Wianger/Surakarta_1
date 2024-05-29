@@ -1,9 +1,121 @@
 #ifndef SURAKARTACOMMON_H
 #define SURAKARTACOMMON_H
 
-#include <surakartapiece.h>
-#include <surakartareason.h>
 #include <iostream>
+#include <QString>
+
+#define SIZE 800
+#define GAP_SIZE 200
+extern unsigned int BOARDSIZE;
+extern unsigned int MAX_NO_CAPTURE_ROUND;
+extern unsigned int CountDown;
+
+using PieceColorMemoryType = int;
+enum class PieceColor : PieceColorMemoryType { BLACK,
+                                               WHITE,
+                                               YELLOW,
+                                               RED,
+                                               NONE,
+                                               UNKNOWN
+};
+
+using SurakartaPlayer = PieceColor;
+
+inline PieceColor ReverseColor(PieceColor color) {
+    switch (color) {
+    case PieceColor::BLACK:
+        return PieceColor::WHITE;
+    case PieceColor::WHITE:
+        return PieceColor::BLACK;
+    default:
+        return color;
+    }
+}
+
+inline std::ostream& operator<<(std::ostream& os, const PieceColor& color) {
+    switch (color) {
+    case PieceColor::NONE:
+        os << ".";
+        break;
+    case PieceColor::BLACK:
+        os << "B";
+        break;
+    case PieceColor::WHITE:
+        os << "W";
+        break;
+    default:
+        os << "?";
+        break;
+    }
+    return os;
+}
+
+inline std::istream& operator>>(std::istream& is, PieceColor& color) {
+    char ch;
+    is >> ch;
+    switch (ch) {
+    case '.':
+        color = PieceColor::NONE;
+        break;
+    case 'B':
+        color = PieceColor::BLACK;
+        break;
+    case 'W':
+        color = PieceColor::WHITE;
+        break;
+    default:
+        color = PieceColor::UNKNOWN;
+        break;
+    }
+    return is;
+}
+
+enum class SurakartaIllegalMoveReason {
+    LEGAL,                     // unused
+    LEGAL_CAPTURE_MOVE,        // capture a opponent's piece, and the move consists at least one corner loop
+    LEGAL_NON_CAPTURE_MOVE,    // just as the name
+    ILLIGAL,                   // unused
+    NOT_PLAYER_TURN,           // move when it's not the player's turn.
+    OUT_OF_BOARD,              // from or to position is out of board
+    NOT_PIECE,                 // move a position that is not a piece
+    NOT_PLAYER_PIECE,          // move a piece that is not the player's
+    ILLIGAL_CAPTURE_MOVE,      // try to capture a opponent's piece, but the move can't consist any corner loop
+    ILLIGAL_NON_CAPTURE_MOVE,  // otherwise
+    GAME_ALREADY_END,          // unused
+    GAME_NOT_START,       // unused
+    TIMEOUT
+};
+
+enum class SurakartaEndReason {
+    NONE,          // not end
+    STALEMATE,     // both players can't make more move
+    CHECKMATE,     // one player's all pieces are captured
+    TRAPPED,       // unused, one player's pieces are all trapped, no legal move can be made.
+    RESIGN,        // one player resigns.
+    TIMEOUT,       // one player's time is out.
+    ILLIGAL_MOVE,    // one player makes an illegal move
+};
+
+bool IsLegalMoveReason(SurakartaIllegalMoveReason reason);
+bool IsEndReason(SurakartaEndReason reason);
+std::ostream& operator<<(std::ostream& os, const SurakartaIllegalMoveReason& reason);
+std::istream& operator>>(std::istream& is, SurakartaIllegalMoveReason& reason);
+
+std::ostream& operator<<(std::ostream& os, const SurakartaEndReason& reason);
+std::istream& operator>>(std::istream& is, SurakartaEndReason& reason);
+
+struct SurakartaPosition {
+    unsigned int x;
+    unsigned int y;
+    SurakartaPosition(unsigned int x = 0, unsigned int y = 0)
+        : x(x), y(y) {}
+    bool operator==(const SurakartaPosition& rhs) const {
+        return x == rhs.x && y == rhs.y;
+    }
+    bool operator!=(const SurakartaPosition& rhs) const {
+        return !(*this == rhs);
+    }
+};
 
 struct SurakartaMove {
     SurakartaPosition from;
@@ -23,16 +135,13 @@ struct SurakartaGameInfo {
     unsigned int last_captured_round_;
     SurakartaEndReason end_reason_;
     SurakartaPlayer winner_;
-    unsigned int max_no_capture_round_;
 
-    SurakartaGameInfo(unsigned int max_no_capture_round = 40)
+    SurakartaGameInfo()
         : current_player_(SurakartaPlayer::BLACK),
         num_round_(1),
         last_captured_round_(0),
         end_reason_(SurakartaEndReason::NONE),
-        winner_(SurakartaPlayer::NONE),
-        max_no_capture_round_(max_no_capture_round) {
-    }
+        winner_(SurakartaPlayer::NONE) {}
 
     void Reset() {
         current_player_ = SurakartaPlayer::BLACK;
@@ -51,7 +160,6 @@ struct SurakartaGameInfo {
         os << "last_captured_round: " << game_info.last_captured_round_ << std::endl;
         os << "end_reason: " << game_info.end_reason_ << std::endl;
         os << "winner: " << game_info.winner_ << std::endl;
-        os << "max_no_capture_round: " << game_info.max_no_capture_round_ << std::endl;
         return os;
     }
 
@@ -62,7 +170,6 @@ struct SurakartaGameInfo {
         is >> str >> game_info.last_captured_round_;
         is >> str >> game_info.end_reason_;
         is >> str >> game_info.winner_;
-        is >> str >> game_info.max_no_capture_round_;
         return is;
     }
 };
@@ -77,4 +184,34 @@ private:
     std::string message_;
 };
 
+inline QString player2str(SurakartaPlayer pl)
+{
+    QString player;
+    if(pl == PieceColor::BLACK)
+        player = "BLACK";
+    else
+        player = "WHITE";
+    return player;
+}
+
+inline QString endReason2String(SurakartaEndReason endReason) {
+    switch (endReason) {
+    case SurakartaEndReason::NONE:
+        return "NONE";
+    case SurakartaEndReason::STALEMATE:
+        return "STALEMATE";
+    case SurakartaEndReason::CHECKMATE:
+        return "CHECKMATE";
+    case SurakartaEndReason::TRAPPED:
+        return "TRAPPED";
+    case SurakartaEndReason::RESIGN:
+        return "RESIGN";
+    case SurakartaEndReason::TIMEOUT:
+        return "TIMEOUT";
+    case SurakartaEndReason:: ILLIGAL_MOVE:
+        return "ILLEGAL_MOVE";
+    default:
+        return "UNKNOWN";
+    }
+}
 #endif // SURAKARTACOMMON_H

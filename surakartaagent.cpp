@@ -7,8 +7,8 @@
 SurakartaMove SurakartaAgent::CalculateMove() {
     std::vector<SurakartaPosition> from;
     std::vector<SurakartaPosition> to;
-    for (unsigned int i = 0; i < board_size_; i++) {
-        for (unsigned int j = 0; j < board_size_; j++) {
+    for (unsigned int i = 0; i < BOARDSIZE; i++) {
+        for (unsigned int j = 0; j < BOARDSIZE; j++) {
             SurakartaPosition position = {i, j};
             if ((*board_)[i][j]->GetColor() == game_info_->current_player_) {
                 from.push_back(position);

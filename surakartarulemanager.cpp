@@ -5,11 +5,11 @@ SurakartaPosition SurakartaRuleManager::Row_Line(SurakartaPosition p, unsigned i
     int r = 4, l = 4;
     if (p.x == c)
         r = 0;
-    else if (p.x == board_size_ - 1 - c)
+    else if (p.x == BOARDSIZE - 1 - c)
         r = 2;
     if (p.y == c)
         l = 3;
-    else if (p.y == board_size_ - 1 - c)
+    else if (p.y == BOARDSIZE - 1 - c)
         l = 1;
 
     return SurakartaPosition(r, l);
@@ -59,7 +59,7 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
             return SurakartaIllegalMoveReason::LEGAL_NON_CAPTURE_MOVE;
     } else {
         // The target position is occupied by the opponent's piece.
-        for (unsigned int i = 1; i < board_size_ / 2; i++) {
+        for (unsigned int i = 1; i < BOARDSIZE / 2; i++) {
             SurakartaPosition ftemp, ttemp;
             int direction[3] = {0, 1};               // 初始移动方向
             int rotation[3][3] = {{0, 1}, {-1, 0}};  // 逆时针旋转90度
@@ -70,18 +70,18 @@ SurakartaIllegalMoveReason SurakartaRuleManager::JudgeMove(const SurakartaMove& 
 
             do {
                 // 取出外圈上的所有棋子
-                if ((*board_)[start.x][start.y]->GetColor() != PieceColor::NONE) {
+                if ((*board_)[start.x][start.y]->GetFixColor() != PieceColor::NONE) {
                     t.push_back((*board_)[start.x][start.y]);
                 }
                 start.x += direction[0], start.y += direction[1];
-                if (start.x == (unsigned)-1 || start.x == board_size_ || start.y == (unsigned)-1 || start.y == board_size_) {
+                if (start.x == (unsigned)-1 || start.x == BOARDSIZE || start.y == (unsigned)-1 || start.y == BOARDSIZE) {
                     piece.push_back(t);
                     t.clear();
-                    if (start.x == (unsigned)-1 || start.x == board_size_) {
-                        start.y = (start.x == (unsigned)-1 ? 0 : board_size_ - 1);
+                    if (start.x == (unsigned)-1 || start.x == BOARDSIZE) {
+                        start.y = (start.x == (unsigned)-1 ? 0 : BOARDSIZE - 1);
                         start.x -= (i + 1) * direction[0];
-                    } else if (start.y == (unsigned)-1 || start.y == board_size_) {
-                        start.x = (start.y == (unsigned)-1 ? board_size_ - 1 : 0);
+                    } else if (start.y == (unsigned)-1 || start.y == BOARDSIZE) {
+                        start.x = (start.y == (unsigned)-1 ? BOARDSIZE - 1 : 0);
                         start.y -= (i + 1) * direction[1];
                     }
                     int temp1 = direction[0], temp2 = direction[1];
@@ -168,8 +168,8 @@ std::pair<SurakartaEndReason, SurakartaPlayer> SurakartaRuleManager::JudgeEnd(co
 
     // 计算黑白棋子数
     int b_num = 0, w_num = 0;
-    for (unsigned int i = 0; i < board_size_; i++) {
-        for (unsigned int j = 0; j < board_size_; j++) {
+    for (unsigned int i = 0; i < BOARDSIZE; i++) {
+        for (unsigned int j = 0; j < BOARDSIZE; j++) {
             if ((*board_)[i][j]->GetColor() == PieceColor::BLACK)
                 b_num++;
             else if ((*board_)[i][j]->GetColor() == PieceColor::WHITE)
@@ -183,10 +183,14 @@ std::pair<SurakartaEndReason, SurakartaPlayer> SurakartaRuleManager::JudgeEnd(co
             b_num--;
     }
     // 判断一方棋子数是否为0
-    if (b_num == 0)
+    if (b_num == 0){
+        winnum = w_num;
         return std::make_pair(SurakartaEndReason::CHECKMATE, SurakartaPlayer::WHITE);
-    else if (w_num == 0)
+    }
+    else if (w_num == 0){
+        winnum = b_num;
         return std::make_pair(SurakartaEndReason::CHECKMATE, SurakartaPlayer::BLACK);
+    }
 
     SurakartaPlayer winner;  // 判断此时场上剩余棋子数更多的一方为胜者
     if (b_num > w_num) {
@@ -197,7 +201,7 @@ std::pair<SurakartaEndReason, SurakartaPlayer> SurakartaRuleManager::JudgeEnd(co
         winner = SurakartaPlayer::NONE;
     }
     // 判断是否和棋
-    if (reason != SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE && game_info_->num_round_ - game_info_->last_captured_round_ >= game_info_->max_no_capture_round_) {
+    if (reason != SurakartaIllegalMoveReason::LEGAL_CAPTURE_MOVE && game_info_->num_round_ - game_info_->last_captured_round_ >= MAX_NO_CAPTURE_ROUND) {
         return std::make_pair(SurakartaEndReason::STALEMATE, winner);
     }
 

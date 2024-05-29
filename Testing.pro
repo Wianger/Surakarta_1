@@ -12,15 +12,16 @@ SOURCES += \
     ../NetworkLibrary/networkdata.cpp \
     ../NetworkLibrary/networkserver.cpp \
     ../NetworkLibrary/networksocket.cpp \
-    logindialog.cpp \
+    choose.cpp \
+    login.cpp \
     main.cpp \
     mainwindow.cpp \
-    setting.cpp \
+    settings.cpp \
     surakartaagent.cpp \
     surakartaboard.cpp \
+    surakartacommon.cpp \
     surakartagame.cpp \
     surakartapiece.cpp \
-    surakartareason.cpp \
     surakartarulemanager.cpp
 
 HEADERS += \
@@ -29,19 +30,22 @@ HEADERS += \
     ../NetworkLibrary/networksocket.h \
     GlobalRandomGenerator.h \
     SurakartaAgentBase.h \
-    logindialog.h \
+    choose.h \
+    login.h \
     mainwindow.h \
-    setting.h \
+    settings.h \
     surakartaagent.h \
     surakartaboard.h \
     surakartacommon.h \
     surakartagame.h \
     surakartapiece.h \
-    surakartareason.h \
     surakartarulemanager.h
 
 FORMS += \
-    mainwindow.ui
+    choose.ui \
+    login.ui \
+    mainwindow.ui \
+    settings.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

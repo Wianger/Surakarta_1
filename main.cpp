@@ -1,11 +1,11 @@
-#include <logindialog.h>
+#include <choose.h>
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    LoginDialog loginDialog;
-    loginDialog.show();
+    Choose choose;
+    choose.show();
     return a.exec();
 }
